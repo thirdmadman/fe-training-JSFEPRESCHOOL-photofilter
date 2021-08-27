@@ -1,10 +1,130 @@
+class MGEAction {
+  actionName = null;
+  image = null;
+  canvas = null;
+  paramObj = null;
+
+  actionControlsEl = null;
+
+  constructor() {
+    //console.log(this.getActionName());
+  }
+
+  getActionName() {
+    return this.actionName;
+  }
+
+  getParamObj() {
+    return this.paramObj;
+  }
+
+  setParamObj(paramObj) {
+    this.paramObj = paramObj;
+  }
+
+  getParamsDescription() {}
+
+  setImage(img) {
+    this.image = img;
+    this.canvas = document.createElement("canvas");
+    this.canvas.width = img.width;
+    this.canvas.height = img.height;
+    this.canvas.getContext("2d").drawImage(this.image, 0, 0);
+    console.log("setImg");
+  }
+
+  renderAction() {
+    //here will be impl of render in childs
+  }
+
+  getRenderedImage(img) {
+    // this.renderAction(this.getParamObj(), canvas);
+
+    // let resultImage = new Image();
+    // resultImage.src = this.canvas.toDataURL();
+
+    // return new Promise((resolve, reject) => {
+    //   let img = new Image()
+    //   img.onload = () => resolve(img.height)
+    //   img.onerror = reject
+    //   img.src = src
+    // })
+
+    return new Promise((resolve, reject) => {
+      let canvas = this.renderAction(this.getParamObj(), img);
+      let resultImage = new Image();
+      resultImage.src =  canvas.toDataURL();
+      //await img.decode();
+      resultImage.onload = () => resolve(resultImage);
+      resultImage.onerror = reject;
+    });
+
+    // return (async () => {
+    //   let canvas = this.renderAction(this.getParamObj(), img);
+    //   let resultImage = new Image();
+    //   resultImage.src = canvas.toDataURL();
+    //   await resultImage.decode();
+    //   return resultImage;
+    //   //console.log( `width: ${ img.width }, height: ${ img.height }` );
+    // })();
+    // return resultImage;
+  }
+
+  getRenderedImageData() {
+    this.renderAction(this.getParamObj());
+    return this.canvas.toDataURL();
+  }
+}
+
+class ActionRotate extends MGEAction {
+  actionName = "rotate";
+  renderAction(paramObj, img) {
+    let canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    let ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((paramObj.degrees * Math.PI) / 180);
+    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+    //ctx.restore();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    return canvas;
+  }
+}
+
+class ActionsSequence {
+  actions = [];
+
+  constructor() {}
+
+  renderResultImage(srcImg) {}
+
+  addAction(action) {
+    this.actions.push(action);
+  }
+
+  removeLastAction() {
+    this.actions.splice(this.actions.length - 1);
+  }
+
+  clearActionsHistory() {}
+}
+
+let ar = new ActionRotate();
 class MultifunctionalGraphicEditor {
   node = null;
   canvasEl = null;
 
   srcImage = null;
 
+  actionsSequence = null;
+
   constructor() {
+    this.actionsSequence = new ActionsSequence();
+
     this.node = document.createElement("div");
     this.node.classList.add("graphic-editor");
 
@@ -34,7 +154,7 @@ class MultifunctionalGraphicEditor {
         fr.onload = () => {
           this.srcImage.src = fr.result;
           this.srcImage.onload = (el) => {
-            this.drawImageInConvas(el.target);
+            this.drawImageInCanvas(el.target);
           };
         };
         fr.readAsDataURL(file);
@@ -54,7 +174,12 @@ class MultifunctionalGraphicEditor {
     btnRotateLeft.textContent = "Rotate Left";
 
     btnRotateLeft.addEventListener("click", () => {
-      this.drawRotated(-1);
+      let rotate = new ActionRotate();
+      rotate.setParamObj({ degrees: 45 });
+
+      console.log(rotate.getRenderedImage(this.srcImage)
+      .then((result) => rotate.getRenderedImage(result))
+      .then((result) => this.drawImageInCanvas(result)));
     });
 
     this.node.appendChild(btnImportImage);
@@ -65,7 +190,7 @@ class MultifunctionalGraphicEditor {
     document.getElementsByTagName("main")[0].appendChild(this.node);
   }
 
-  drawImageInConvas(img) {
+  drawImageInCanvas(img) {
     this.canvasEl.width = img.width;
     this.canvasEl.height = img.height;
     let ctx = this.canvasEl.getContext("2d");
@@ -86,7 +211,6 @@ class MultifunctionalGraphicEditor {
 }
 
 let MGE = new MultifunctionalGraphicEditor();
-
 
 // function drawRotated(degrees) {
 //   let ctx = canvas.getContext("2d");
