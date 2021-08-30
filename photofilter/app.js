@@ -67,9 +67,9 @@ class MGEAction {
 }
 
 class ActionRotate extends MGEAction {
-  actionName = "rotate";
+  actionName = 'rotate';
   renderAction(paramObj, img) {
-    let canvas = document.createElement("canvas");
+    let canvas = document.createElement('canvas');
 
     canvas.width = img.width;
     canvas.height = img.height;
@@ -79,7 +79,7 @@ class ActionRotate extends MGEAction {
       canvas.height = canvas.width;
     }
 
-    let ctx = canvas.getContext("2d");
+    let ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     //ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -92,25 +92,25 @@ class ActionRotate extends MGEAction {
 }
 
 class ActionFilterBlur extends MGEAction {
-  actionName = "FilterBlur";
+  actionName = 'FilterBlur';
   renderAction(paramObj, img) {
-    let canvas = document.createElement("canvas");
+    let canvas = document.createElement('canvas');
     canvas.width = img.width;
     canvas.height = img.height;
 
-    let ctx = canvas.getContext("2d");
+    let ctx = canvas.getContext('2d');
 
-    ctx.filter = "blur(" + paramObj.length + ")";
+    ctx.filter = 'blur(' + paramObj.length + ')';
     ctx.drawImage(img, 0, 0);
     return canvas;
   }
 }
 
 class ActionCropImage extends MGEAction {
-  actionName = "CropImage";
+  actionName = 'CropImage';
   renderAction(paramObj, img) {
-    let canvas = document.createElement("canvas");
-    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+    let canvas = document.createElement('canvas');
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
     canvas.width = width;
     canvas.height = height;
 
@@ -124,7 +124,7 @@ class ActionCropImage extends MGEAction {
     let destX = canvas.width / 2 - destWidth / 2;
     let destY = canvas.height / 2 - destHeight / 2;
 
-    canvas.getContext("2d").drawImage(img, scrCropX, srcCropY, srcCropWidth, srcCropHeight, destX, destY, destWidth, destHeight);
+    canvas.getContext('2d').drawImage(img, scrCropX, srcCropY, srcCropWidth, srcCropHeight, destX, destY, destWidth, destHeight);
     return canvas;
   }
 }
@@ -162,64 +162,73 @@ class ActionsSequence {
     return this.actions[this.actions.length - 1];
   }
 
+  getActionNamesArray() {
+    return this.actions.map(el => el.actionName);
+  }
+
   clearActionsHistory() {}
 }
 class MultifunctionalGraphicEditor {
-  actions = ["rotate","filterblur","cropimage"];
+  actions = ['rotate','filterblur','cropimage'];
   node = null;
   canvasEl = null;
   srcImage = null;
   actionsSequence = null;
 
   currentActionControlsEl = null;
+  actionsHistoryEl = null;
 
   constructor() {
     this.actionsSequence = new ActionsSequence();
 
-    this.node = document.createElement("div");
-    this.node.classList.add("graphic-editor");
+    this.node = document.createElement('div');
+    this.node.classList.add('graphic-editor');
 
-    this.currentActionControlsEl = document.createElement("div");
-    this.currentActionControlsEl.classList.add("graphic-editor__current-action-controls");
+    this.currentActionControlsEl = document.createElement('div');
+    this.currentActionControlsEl.classList.add('graphic-editor__current-action-controls');
 
-    this.canvasEl = document.createElement("canvas");
+    this.canvasEl = document.createElement('canvas');
 
-    const canvasFieldEl = document.createElement("div");
-    canvasFieldEl.classList.add("graphic-editor__canvas-field");
+    const canvasFieldEl = document.createElement('div');
+    canvasFieldEl.classList.add('graphic-editor__canvas-field');
     canvasFieldEl.appendChild(this.canvasEl);
 
-    const btnImportImage = document.createElement("input");
-    btnImportImage.classList.add("graphic-editor__button-import-image");
-    btnImportImage.type = "file";
-    btnImportImage.textContent = "Import Image";
+    const btnImportImage = document.createElement('input');
+    btnImportImage.classList.add('graphic-editor__button-import-image');
+    btnImportImage.type = 'file';
+    btnImportImage.textContent = 'Import Image';
 
-    const avalibleActionsEl = document.createElement("div");
-    avalibleActionsEl.classList.add("graphic-editor__avalible-actions");
+    const avalibleActionsEl = document.createElement('div');
+    avalibleActionsEl.classList.add('graphic-editor__avalible-actions');
+
+    this.actionsHistoryEl = document.createElement('div');
+    this.actionsHistoryEl.classList.add('graphic-editor__actions-history');
 
     this.actions.forEach((el) => {
-      const button = document.createElement("button");
+      const button = document.createElement('button');
       button.onclick = () => this.selectCurrentAction(el);
       button.textContent = el;
       avalibleActionsEl.appendChild(button);
     });
 
-    const mainMenuEl = document.createElement("div");
-    mainMenuEl.classList.add("graphic-editor__main-menu");
+    const mainMenuEl = document.createElement('div');
+    mainMenuEl.classList.add('graphic-editor__main-menu');
     mainMenuEl.appendChild(btnImportImage);
     mainMenuEl.appendChild(avalibleActionsEl);
+    mainMenuEl.appendChild(this.actionsHistoryEl);
 
-    btnImportImage.addEventListener("change", (e) => {
+    btnImportImage.addEventListener('change', (e) => {
       this.srcImage = new Image();
-      if (typeof window.FileReader !== "function") {
-        console.log("The file API isn't supported on this browser yet.");
+      if (typeof window.FileReader !== 'function') {
+        console.log('The file API isn\'t supported on this browser yet.');
         return;
       }
       if (!e.target) {
-        console.log("Um, couldn't find the imgfile element.");
+        console.log('Um, couldn\'t find the imgfile element.');
       } else if (!e.target.files) {
-        console.log("This browser doesn't seem to support the `files` property of file inputs.");
+        console.log('This browser doesn\'t seem to support the `files` property of file inputs.');
       } else if (!e.target.files[0]) {
-        console.log("Please select a file before clicking 'Load'");
+        console.log('Please select a file before clicking \'Load\'');
       } else {
         let file, fr;
         file = e.target.files[0];
@@ -238,11 +247,11 @@ class MultifunctionalGraphicEditor {
     this.node.appendChild(canvasFieldEl);
     this.node.appendChild(this.currentActionControlsEl);
 
-    document.getElementsByTagName("main")[0].appendChild(this.node);
+    document.getElementsByTagName('main')[0].appendChild(this.node);
   }
 
   renderFinalImage() {
-    //document.getElementsByTagName("main")[0].appendChild(this.srcImage);
+    //document.getElementsByTagName('main')[0].appendChild(this.srcImage);
     //console.log(this.actionsSequence.renderResultImage(this.srcImage));
     this.actionsSequence.renderResultImage(this.srcImage).then((result) => this.drawImageInCanvas(result));
   }
@@ -250,8 +259,13 @@ class MultifunctionalGraphicEditor {
   drawImageInCanvas(img) {
     this.canvasEl.width = img.width;
     this.canvasEl.height = img.height;
-    let ctx = this.canvasEl.getContext("2d");
+    let ctx = this.canvasEl.getContext('2d');
     ctx.drawImage(img, 0, 0);
+  }
+
+  renderCurrentActionsHistory() {
+    this.actionsHistoryEl.textContent = '';
+    this.actionsSequence.getActionNamesArray().forEach(el => this.actionsHistoryEl.textContent += ' > ' + el);
   }
 
   selectCurrentAction(action) {
@@ -259,22 +273,23 @@ class MultifunctionalGraphicEditor {
       this.actionsSequence.removeLastAction()
     }
     this.renderFinalImage();
-    this.currentActionControlsEl.innerHTML = "";
+    this.currentActionControlsEl.innerHTML = '';
+    this.renderCurrentActionsHistory();
     switch (action) {
-      case "rotate": {
-        const isExpandCheckbox = document.createElement("input");
-        isExpandCheckbox.type = "checkbox";
+      case 'rotate': {
+        const isExpandCheckbox = document.createElement('input');
+        isExpandCheckbox.type = 'checkbox';
 
-        const inputRotate = document.createElement("input");
-        inputRotate.classList.add("graphic-editor__input-rotate-image");
-        inputRotate.type = "range";
-        inputRotate.min = "-360";
-        inputRotate.max = "360";
+        const inputRotate = document.createElement('input');
+        inputRotate.classList.add('graphic-editor__input-rotate-image');
+        inputRotate.type = 'range';
+        inputRotate.min = '-360';
+        inputRotate.max = '360';
         inputRotate.step = 1;
         inputRotate.value = 0;
         inputRotate.oninput = (e) => {
           let lastAction = this.actionsSequence.getLastAction();
-          if (lastAction && lastAction.actionName === "rotate") {
+          if (lastAction && lastAction.actionName === 'rotate' && !lastAction.isCommited ) {
             lastAction.setParamObj({ degrees: e.target.value, expand: isExpandCheckbox.checked });
           } else {
             let rotate = new ActionRotate();
@@ -283,7 +298,7 @@ class MultifunctionalGraphicEditor {
           }
 
           // let blur = new ActionFilterBlur();
-          // blur.setParamObj({ length: "10px" });
+          // blur.setParamObj({ length: '10px' });
 
           this.renderFinalImage();
         };
@@ -291,9 +306,9 @@ class MultifunctionalGraphicEditor {
         this.currentActionControlsEl.appendChild(inputRotate);
       }
     }
-    const buttonCommit = document.createElement("button");
-    buttonCommit.classList.add("button-commit-changes");
-    buttonCommit.textContent = "Commit changes made in current action";
+    const buttonCommit = document.createElement('button');
+    buttonCommit.classList.add('button-commit-changes');
+    buttonCommit.textContent = 'Commit changes made in current action';
     buttonCommit.onclick = () => this.actionsSequence.getLastAction().isCommited = true;
     this.currentActionControlsEl.appendChild(buttonCommit);
 
@@ -301,3 +316,34 @@ class MultifunctionalGraphicEditor {
 }
 
 let MGE = new MultifunctionalGraphicEditor();
+
+const addReminder = () => {
+  const reminderEl = document.createElement('div');
+  reminderEl.classList.add('reminder');
+
+  const reminderContentEl = document.createElement('div');
+  reminderContentEl.classList.add('reminder-content');
+
+  const remindertitileEl = document.createElement('div');
+  remindertitileEl.classList.add('reminder__title');
+
+  remindertitileEl.innerHTML = 'Hello there!<br>This task still in progress. I need just a little bit of time... <br> Me in discord: <strong>thirdmadman</strong>';
+
+  const reminderDescriptionEl = document.createElement('div');
+  reminderDescriptionEl.classList.add('reminder__description');
+
+  reminderDescriptionEl.innerHTML = '<p>In this app I have used canvas, so it\'s more about Graphic Editor other than Photo Filter - after each action, image, witch is rendered in page is changed - try to save it. In example of "photo filter" image actually is no changing, its only css transformations, so if you try to save it, you will not to see any changes.</p><p>Just in fact: in this structure of classes I have "actions history" (class ActionsSequence), actually that means that you will have a ability to cancel actions, save project to file, load previous project. You can chek out app.js for more info.</p><p>I afraid that for now, only features that you can use via UI is load image and rotate image (chekbox for "crop" and "not crop" rotation)<p/>';
+
+  const buttonClose = document.createElement('button');
+  buttonClose.classList.add('reminder__button-close');
+  buttonClose.onclick = () => reminderEl.classList.add('visually-hidden');
+  buttonClose.textContent = 'X';
+
+  reminderDescriptionEl.appendChild(buttonClose);
+  reminderContentEl.appendChild(remindertitileEl);
+  reminderContentEl.appendChild(reminderDescriptionEl);
+  reminderEl.appendChild(reminderContentEl);
+
+  document.body.appendChild(reminderEl);
+}
+addReminder();

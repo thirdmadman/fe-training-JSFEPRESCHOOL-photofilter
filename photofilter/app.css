@@ -1,0 +1,82 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  height: 100vh;
+  font-family: "Roboto", sans-serif;
+}
+
+.container {
+  max-width: 1440px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  border: 0 !important;
+  padding: 0 !important;
+  clip: rect(0 0 0 0) !important;
+  overflow: hidden !important;
+}
+
+
+
+
+
+
+
+.reminder {
+  position: absolute;
+  display: flex;
+  top: 0px;
+  left: 0px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: #ffffffed;
+}
+
+.reminder-content {
+  max-width: 640px;
+  line-height: 26px;
+  position: relative;
+}
+
+.reminder__title {
+  padding: 20px;
+  font-size: 18px;
+}
+
+.reminder__description {
+  padding: 5px;
+}
+
+.reminder__description > p {
+  display: block;
+  margin-top: 10px;
+}
+
+.reminder__button-close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: none;
+  border: none;
+  font-weight: 800;
+  color: rgb(187, 0, 0);
+}
+.reminder__button-close:hover {
+  cursor: pointer;
+  color: red;
+}
