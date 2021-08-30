@@ -1,8 +1,7 @@
 class MGEAction {
   actionName = null;
-  image = null;
-  canvas = null;
   paramObj = null;
+  isCommited = false;
 
   actionControlsEl = null;
 
@@ -24,15 +23,6 @@ class MGEAction {
 
   getParamsDescription() {}
 
-  setImage(img) {
-    this.image = img;
-    this.canvas = document.createElement("canvas");
-    this.canvas.width = img.width;
-    this.canvas.height = img.height;
-    this.canvas.getContext("2d").drawImage(this.image, 0, 0);
-    console.log("setImg");
-  }
-
   renderAction() {
     //here will be impl of render in childs
   }
@@ -53,7 +43,7 @@ class MGEAction {
     return new Promise((resolve, reject) => {
       let canvas = this.renderAction(this.getParamObj(), img);
       let resultImage = new Image();
-      resultImage.src =  canvas.toDataURL();
+      resultImage.src = canvas.toDataURL();
       //await img.decode();
       resultImage.onload = () => resolve(resultImage);
       resultImage.onerror = reject;
@@ -80,8 +70,14 @@ class ActionRotate extends MGEAction {
   actionName = "rotate";
   renderAction(paramObj, img) {
     let canvas = document.createElement("canvas");
+
     canvas.width = img.width;
     canvas.height = img.height;
+
+    if (paramObj.expand) {
+      canvas.width = Math.sqrt(img.width * img.width + img.height * img.height);
+      canvas.height = canvas.width;
+    }
 
     let ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -95,32 +91,87 @@ class ActionRotate extends MGEAction {
   }
 }
 
+class ActionFilterBlur extends MGEAction {
+  actionName = "FilterBlur";
+  renderAction(paramObj, img) {
+    let canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    let ctx = canvas.getContext("2d");
+
+    ctx.filter = "blur(" + paramObj.length + ")";
+    ctx.drawImage(img, 0, 0);
+    return canvas;
+  }
+}
+
+class ActionCropImage extends MGEAction {
+  actionName = "CropImage";
+  renderAction(paramObj, img) {
+    let canvas = document.createElement("canvas");
+    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+    canvas.width = width;
+    canvas.height = height;
+
+    let scrCropX = paramObj.x;
+    let srcCropY = paramObj.y;
+    let srcCropWidth = paramObj.width;
+    let srcCropHeight = paramObj.height;
+
+    let destWidth = srcCropWidth;
+    let destHeight = srcCropHeight;
+    let destX = canvas.width / 2 - destWidth / 2;
+    let destY = canvas.height / 2 - destHeight / 2;
+
+    canvas.getContext("2d").drawImage(img, scrCropX, srcCropY, srcCropWidth, srcCropHeight, destX, destY, destWidth, destHeight);
+    return canvas;
+  }
+}
 class ActionsSequence {
   actions = [];
 
   constructor() {}
 
-  renderResultImage(srcImg) {}
+  renderResultImage(srcImg) {
+    let prevEl = null;
+    if (this.actions !== null && this.actions.length > 0) {
+      prevEl = this.actions[0].getRenderedImage(srcImg);
+      if (this.actions.length > 1) {
+        for (let i = 1; i < this.actions.length; i++) {
+          prevEl = prevEl.then((result) => this.actions[i].getRenderedImage(result));
+        }
+      }
+    } else {
+      return new Promise((resolve, reject) => {
+        resolve(srcImg);
+      });
+    }
+    return prevEl;
+  }
 
   addAction(action) {
-    this.actions.push(action);
+    return this.actions.push(action);
   }
 
   removeLastAction() {
-    this.actions.splice(this.actions.length - 1);
+    return this.actions.splice(this.actions.length - 1);
+  }
+
+  getLastAction() {
+    return this.actions[this.actions.length - 1];
   }
 
   clearActionsHistory() {}
 }
-
-let ar = new ActionRotate();
 class MultifunctionalGraphicEditor {
+  actions = ["rotate","filterblur","cropimage"];
   node = null;
   canvasEl = null;
-
   srcImage = null;
-
   actionsSequence = null;
+
+  currentActionControlsEl = null;
 
   constructor() {
     this.actionsSequence = new ActionsSequence();
@@ -128,12 +179,34 @@ class MultifunctionalGraphicEditor {
     this.node = document.createElement("div");
     this.node.classList.add("graphic-editor");
 
+    this.currentActionControlsEl = document.createElement("div");
+    this.currentActionControlsEl.classList.add("graphic-editor__current-action-controls");
+
     this.canvasEl = document.createElement("canvas");
+
+    const canvasFieldEl = document.createElement("div");
+    canvasFieldEl.classList.add("graphic-editor__canvas-field");
+    canvasFieldEl.appendChild(this.canvasEl);
 
     const btnImportImage = document.createElement("input");
     btnImportImage.classList.add("graphic-editor__button-import-image");
     btnImportImage.type = "file";
     btnImportImage.textContent = "Import Image";
+
+    const avalibleActionsEl = document.createElement("div");
+    avalibleActionsEl.classList.add("graphic-editor__avalible-actions");
+
+    this.actions.forEach((el) => {
+      const button = document.createElement("button");
+      button.onclick = () => this.selectCurrentAction(el);
+      button.textContent = el;
+      avalibleActionsEl.appendChild(button);
+    });
+
+    const mainMenuEl = document.createElement("div");
+    mainMenuEl.classList.add("graphic-editor__main-menu");
+    mainMenuEl.appendChild(btnImportImage);
+    mainMenuEl.appendChild(avalibleActionsEl);
 
     btnImportImage.addEventListener("change", (e) => {
       this.srcImage = new Image();
@@ -153,41 +226,25 @@ class MultifunctionalGraphicEditor {
         fr = new FileReader();
         fr.onload = () => {
           this.srcImage.src = fr.result;
-          this.srcImage.onload = (el) => {
-            this.drawImageInCanvas(el.target);
+          this.srcImage.onload = () => {
+            this.renderFinalImage();
           };
         };
         fr.readAsDataURL(file);
       }
     });
 
-    const btnRotateRight = document.createElement("button");
-    btnRotateRight.classList.add("graphic-editor__button-rotate-image");
-    btnRotateRight.textContent = "Rotate right";
-
-    btnRotateRight.addEventListener("click", () => {
-      this.drawRotated(+1);
-    });
-
-    const btnRotateLeft = document.createElement("button");
-    btnRotateLeft.classList.add("graphic-editor__button-rotate-image");
-    btnRotateLeft.textContent = "Rotate Left";
-
-    btnRotateLeft.addEventListener("click", () => {
-      let rotate = new ActionRotate();
-      rotate.setParamObj({ degrees: 45 });
-
-      console.log(rotate.getRenderedImage(this.srcImage)
-      .then((result) => rotate.getRenderedImage(result))
-      .then((result) => this.drawImageInCanvas(result)));
-    });
-
-    this.node.appendChild(btnImportImage);
-    this.node.appendChild(this.canvasEl);
-    this.node.appendChild(btnRotateRight);
-    this.node.appendChild(btnRotateLeft);
+    this.node.appendChild(mainMenuEl);
+    this.node.appendChild(canvasFieldEl);
+    this.node.appendChild(this.currentActionControlsEl);
 
     document.getElementsByTagName("main")[0].appendChild(this.node);
+  }
+
+  renderFinalImage() {
+    //document.getElementsByTagName("main")[0].appendChild(this.srcImage);
+    //console.log(this.actionsSequence.renderResultImage(this.srcImage));
+    this.actionsSequence.renderResultImage(this.srcImage).then((result) => this.drawImageInCanvas(result));
   }
 
   drawImageInCanvas(img) {
@@ -197,60 +254,50 @@ class MultifunctionalGraphicEditor {
     ctx.drawImage(img, 0, 0);
   }
 
-  drawRotated(degrees) {
-    let ctx = this.canvasEl.getContext("2d");
-    ctx.clearRect(0, 0, this.canvasEl.width, this.canvasEl.height);
-    //ctx.save();
-    ctx.translate(this.canvasEl.width / 2, this.canvasEl.height / 2);
-    ctx.rotate((degrees * Math.PI) / 180);
-    ctx.drawImage(this.srcImage, -this.srcImage.width / 2, -this.srcImage.height / 2);
-    //ctx.restore();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    //this.srcImage.src = this.canvasEl.toDataURL();
+  selectCurrentAction(action) {
+    if (this.actionsSequence.getLastAction() && !this.actionsSequence.getLastAction().isCommited) {
+      this.actionsSequence.removeLastAction()
+    }
+    this.renderFinalImage();
+    this.currentActionControlsEl.innerHTML = "";
+    switch (action) {
+      case "rotate": {
+        const isExpandCheckbox = document.createElement("input");
+        isExpandCheckbox.type = "checkbox";
+
+        const inputRotate = document.createElement("input");
+        inputRotate.classList.add("graphic-editor__input-rotate-image");
+        inputRotate.type = "range";
+        inputRotate.min = "-360";
+        inputRotate.max = "360";
+        inputRotate.step = 1;
+        inputRotate.value = 0;
+        inputRotate.oninput = (e) => {
+          let lastAction = this.actionsSequence.getLastAction();
+          if (lastAction && lastAction.actionName === "rotate") {
+            lastAction.setParamObj({ degrees: e.target.value, expand: isExpandCheckbox.checked });
+          } else {
+            let rotate = new ActionRotate();
+            rotate.setParamObj({ degrees: e.target.value, expand: isExpandCheckbox.checked });
+            this.actionsSequence.addAction(rotate);
+          }
+
+          // let blur = new ActionFilterBlur();
+          // blur.setParamObj({ length: "10px" });
+
+          this.renderFinalImage();
+        };
+        this.currentActionControlsEl.appendChild(isExpandCheckbox);
+        this.currentActionControlsEl.appendChild(inputRotate);
+      }
+    }
+    const buttonCommit = document.createElement("button");
+    buttonCommit.classList.add("button-commit-changes");
+    buttonCommit.textContent = "Commit changes made in current action";
+    buttonCommit.onclick = () => this.actionsSequence.getLastAction().isCommited = true;
+    this.currentActionControlsEl.appendChild(buttonCommit);
+
   }
 }
 
 let MGE = new MultifunctionalGraphicEditor();
-
-// function drawRotated(degrees) {
-//   let ctx = canvas.getContext("2d");
-//   ctx.clearRect(0, 0, canvas.width, canvas.height);
-//   //ctx.save();
-//   ctx.translate(canvas.width / 2, canvas.height / 2);
-//   ctx.rotate((degrees * Math.PI) / 180);
-//   ctx.drawImage(srcImage, -srcImage.width / 2, -srcImage.height / 2);
-//   //ctx.restore();
-//   ctx.setTransform(1, 0, 0, 1, 0, 0);
-//   srcImage.src = canvas.toDataURL();
-// }
-
-// function cropImage(x, y, width, height) {
-//   canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-//   canvas.width = width;
-//   canvas.height = height;
-
-//   let scrCropX = x;
-//   let srcCropY = y;
-//   let srcCropWidth = width;
-//   let srcCropHeight = height;
-
-//   let destWidth = srcCropWidth;
-//   let destHeight = srcCropHeight;
-//   let destX = canvas.width / 2 - destWidth / 2;
-//   let destY = canvas.height / 2 - destHeight / 2;
-
-//   canvas.getContext("2d").drawImage(srcImage, scrCropX, srcCropY, srcCropWidth, srcCropHeight, destX, destY, destWidth, destHeight);
-//   srcImage.src = canvas.toDataURL();
-// }
-
-// function imagedata_to_image(imagedata) {
-//   let canvas2 = document.createElement("canvas");
-//   let ctx2 = canvas2.getContext("2d");
-//   canvas2.width = imagedata.width;
-//   canvas2.height = imagedata.height;
-//   ctx2.putImageData(imagedata, 0, 0);
-
-//   let image2 = new Image();
-//   image2.src = canvas2.toDataURL();
-//   return image2;
-// }
