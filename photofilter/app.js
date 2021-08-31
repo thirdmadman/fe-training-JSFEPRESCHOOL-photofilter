@@ -106,6 +106,21 @@ class ActionFilterBlur extends MGEAction {
   }
 }
 
+class ActionFilterBrightnessСontrast extends MGEAction {
+  actionName = "Filter Brightness/Сontrast";
+  renderAction(paramObj, img) {
+    let canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    let ctx = canvas.getContext("2d");
+
+    ctx.filter = "brightness(" + paramObj.brightness + ")" + " contrast(" + paramObj.contrast + ")";
+    ctx.drawImage(img, 0, 0);
+    return canvas;
+  }
+}
+
 class ActionCropImage extends MGEAction {
   actionName = "Crop Image";
   renderAction(paramObj, img) {
@@ -169,7 +184,7 @@ class ActionsSequence {
   clearActionsHistory() {}
 }
 class MultifunctionalGraphicEditor {
-  actions = ["Rotate Image", "Filter Blur", "Crop Image"];
+  actions = ["Rotate Image", "Filter Blur", "Crop Image", "Filter Brightness/Сontrast"];
   node = null;
   canvasEl = null;
   srcImage = null;
@@ -394,6 +409,66 @@ class MultifunctionalGraphicEditor {
 
           
           this.currentActionControlsEl.appendChild(inputRangeLabel);
+          break;
+        }
+        case "Filter Brightness/Сontrast": {
+          const inputRange = document.createElement("input");
+          inputRange.classList.add("graphic-editor__action-input-range");
+          inputRange.type = "range";
+          inputRange.min = "0";
+          inputRange.max = "200";
+          inputRange.step = 0.5;
+          inputRange.value = 100;
+          inputRange.oninput = (e) => {
+            let lastAction = this.actionsSequence.getLastAction();
+            if (lastAction && lastAction.actionName === "Filter Brightness/Сontrast" && !lastAction.isCommited) {
+              lastAction.setParamObj({ brightness: e.target.value + '%', contrast: lastAction.getParamObj().contrast});
+            } else {
+              let action = new ActionFilterBrightnessСontrast();
+              action.setParamObj({ brightness: inputRange.value + '%', contrast: inputRange2.value+"%"});
+              this.actionsSequence.addAction(action);
+            }
+            this.renderFinalImage();
+          };
+
+          const inputRangeLabel = document.createElement("label");
+          inputRangeLabel.classList.add("graphic-editor__action-input-range-label");
+          const inputRangeLabelText = document.createElement("p");
+          inputRangeLabelText.textContent= "Brightness";
+          inputRangeLabel.appendChild(inputRangeLabelText);
+          inputRangeLabel.appendChild(inputRange);
+
+          
+
+          const inputRange2 = document.createElement("input");
+          inputRange2.classList.add("graphic-editor__action-input-range");
+          inputRange2.type = "range";
+          inputRange2.min = "0";
+          inputRange2.max = "200";
+          inputRange2.step = 0.5;
+          inputRange2.value = 100;
+          inputRange2.oninput = (e) => {
+            let lastAction = this.actionsSequence.getLastAction();
+            if (lastAction && lastAction.actionName === "Filter Brightness/Сontrast" && !lastAction.isCommited) {
+              lastAction.setParamObj({ brightness: lastAction.getParamObj().brightness, contrast: e.target.value + '%'});
+            } else {
+              let action = new ActionFilterBrightnessСontrast();
+              action.setParamObj({ brightness: inputRange.value + '%', contrast: e.target.value + '%'});
+              this.actionsSequence.addAction(action);
+            }
+            this.renderFinalImage();
+          };
+
+          const inputRange2Label = document.createElement("label");
+          inputRangeLabel.classList.add("graphic-editor__action-input-range-label");
+          const inputRange2LabelText = document.createElement("p");
+          inputRange2LabelText.textContent= "Сontrast";
+          inputRange2Label.appendChild(inputRange2LabelText);
+          inputRange2Label.appendChild(inputRange2);
+
+          this.currentActionControlsEl.appendChild(inputRangeLabel);
+          this.currentActionControlsEl.appendChild(inputRange2Label);
+          break;
         }
       }
 
