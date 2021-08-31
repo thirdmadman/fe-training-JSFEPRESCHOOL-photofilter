@@ -130,7 +130,7 @@ body {
 .graphic-editor {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   background: #4c4c4c;
   color: #ffffff;
@@ -183,15 +183,23 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  margin: 10px 0;
+  margin: 20px 0;
 }
 
 .graphic-editor__input-rotate-image {
   min-width: 320px;
 }
 
+.graphic-editor__button-import-image-label {
+}
+
+.graphic-editor__button-import-image-label:hover {}
+
+.graphic-editor__button-export-image {
+}
+
 .graphic-editor__button_commit-changes {
-  margin: 10px;
+  margin: 10px 0px;
   padding: 10px;
 }
 
@@ -199,6 +207,21 @@ body {
   background-color: #3e8e41;
 }
 
+.graphic-editor__action-checkbox {
+    margin-right: 15px;
+}
+.graphic-editor__action-checkbox-label {
+    margin-bottom: 20px;
+}
+.graphic-editor__action-input-range-label {
+    margin-bottom: 15px;
+}
+.graphic-editor__action-input-range {
+    width: 320px;
+    margin-top: 5px;
+}
+
+/* reminder */
 .reminder {
   position: absolute;
   display: flex;
