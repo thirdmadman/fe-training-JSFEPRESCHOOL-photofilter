@@ -31,6 +31,9 @@ body {
 
 .graphic-editor__canvas-field {
   position: relative;
+  border: 1px solid #ffffff;
+  font-size: 0px;
+  background: url('assets/png/background/bg-transparent.png');
 }
 
 .graphic-editor__canvas-field:before {
