@@ -175,6 +175,8 @@ class MultifunctionalGraphicEditor {
   srcImage = null;
   actionsSequence = null;
 
+  resultImgEl = null;
+
   currentActionControlsEl = null;
   actionsHistoryEl = null;
 
@@ -184,6 +186,9 @@ class MultifunctionalGraphicEditor {
     this.node = document.createElement('div');
     this.node.classList.add('graphic-editor');
 
+    this.resultImgEl = document.createElement('img');
+    this.resultImgEl.classList.add('graphic-editor__rendered-image');
+
     this.currentActionControlsEl = document.createElement('div');
     this.currentActionControlsEl.classList.add('graphic-editor__current-action-controls');
 
@@ -191,7 +196,8 @@ class MultifunctionalGraphicEditor {
 
     const canvasFieldEl = document.createElement('div');
     canvasFieldEl.classList.add('graphic-editor__canvas-field');
-    canvasFieldEl.appendChild(this.canvasEl);
+    canvasFieldEl.appendChild(this.resultImgEl);
+    //canvasFieldEl.appendChild(this.canvasEl);
 
     const btnImportImage = document.createElement('input');
     btnImportImage.classList.add('graphic-editor__button-import-image');
@@ -263,6 +269,8 @@ class MultifunctionalGraphicEditor {
     this.canvasEl.height = img.height;
     let ctx = this.canvasEl.getContext('2d');
     ctx.drawImage(img, 0, 0);
+
+    this.resultImgEl.src = img.src; 
   }
 
   renderCurrentActionsHistory() {
@@ -336,12 +344,13 @@ const addReminder = () => {
   const reminderDescriptionEl = document.createElement('div');
   reminderDescriptionEl.classList.add('reminder__description');
 
-  reminderDescriptionEl.innerHTML = '<p>In this app I have used canvas, so it\'s more about Graphic Editor other than Photo Filter - after each action, image, witch is rendered in page is changed - try to save it. In example of "photo filter" image actually is no changing, its only css transformations, so if you try to save it, you will not to see any changes.</p><p>Just in fact: in this structure of classes I have "actions history" (class ActionsSequence), actually that means that you will have a ability to cancel actions, save project to file, load previous project. You can chek out app.js for more info.</p><p>I afraid that for now, only features that you can use via UI is load image and rotate image (chekbox for "crop" and "not crop" rotation)<p/>';
-
+  reminderDescriptionEl.innerHTML = '<p>In this app I have used canvas, so it\'s more about Graphic Editor other than Photo Filter - after each action, image, witch is rendered in page are changed - <mark>try to save it</mark>. In example of "photo filter" image actually is no changing, its only css transformations, so if you try to save it, you will not to see any changes.</p><p>Just in fact: in this structure of classes I have "actions history" (class ActionsSequence), actually that means that you will have a ability to cancel actions, save project to file, load previous project. You can chek out app.js for more info.</p><p>I afraid that for now, only features that you can use via UI is <mark>load image</mark> and <mark>rotate image</mark> (chekbox for "crop" and "not crop" rotation)<p/>';
+  //reminderDescriptionEl.innerHTML += '<p>Oh, and before you write "task is not done" show me you task, at least that will be honest, right, anonymous friend? If you wrote any your structure of classes or just ?..<p/>';
+  reminderDescriptionEl.innerHTML += "<p>last upd: 13:23 MSK 31.08.2021</p>"
   const buttonClose = document.createElement('button');
   buttonClose.classList.add('reminder__button-close');
   buttonClose.onclick = () => reminderEl.classList.add('visually-hidden');
-  buttonClose.textContent = 'X';
+  buttonClose.textContent = 'ok, let me close this reminder and view current status of task';
 
   reminderDescriptionEl.appendChild(buttonClose);
   reminderContentEl.appendChild(remindertitileEl);
