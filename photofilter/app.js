@@ -230,6 +230,12 @@ class MultifunctionalGraphicEditor {
     btnExportImage.textContent = "Export Image";
     btnExportImage.onclick = () => this.downloadImageInCanvas();
 
+    const btnCancelLastAction = document.createElement("button");
+    btnCancelLastAction.classList.add("graphic-editor__button");
+    btnCancelLastAction.classList.add("graphic-editor__button-cancel-last-action");
+    btnCancelLastAction.textContent = "Cancel Last Action";
+    btnCancelLastAction.onclick = () => this.cancelLastAction();
+
     labelImportImage.appendChild(btnImportImage);
 
     const fileActionEl = document.createElement("div");
@@ -237,6 +243,7 @@ class MultifunctionalGraphicEditor {
 
     fileActionEl.appendChild(labelImportImage);
     fileActionEl.appendChild(btnExportImage);
+    fileActionEl.appendChild(btnCancelLastAction);
 
     const avalibleActionsEl = document.createElement("div");
     avalibleActionsEl.classList.add("graphic-editor__avalible-actions");
@@ -319,6 +326,14 @@ class MultifunctionalGraphicEditor {
   renderCurrentActionsHistory() {
     this.actionsHistoryEl.textContent = "";
     this.actionsSequence.getActionNamesArray().forEach((el) => (this.actionsHistoryEl.textContent += " > " + el));
+  }
+
+  cancelLastAction() {
+    if (this.actionsSequence.getLastAction()) {
+      this.actionsSequence.removeLastAction();
+      this.renderFinalImage();
+      this.renderCurrentActionsHistory();
+    }
   }
 
   selectCurrentAction(action) {
