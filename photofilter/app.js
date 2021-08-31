@@ -508,7 +508,7 @@ const addReminder = () => {
   reminderDescriptionEl.innerHTML =
     '<p>In this app I have used canvas, so it\'s more about Graphic Editor other than Photo Filter - after each action, image, witch is rendered in page are changed - <mark>try to save it</mark>. In example of "photo filter" image actually is no changing, its only css transformations, so if you try to save it, you will not to see any changes.</p><p>Just in fact: in this structure of classes I have "actions history" (class ActionsSequence), actually that means that you will have a ability to cancel actions, save project to file, load previous project. You can chek out app.js for more info.</p><p>I afraid that for now, only features that you can use via UI is <mark>load image</mark> and <mark>rotate image</mark> (chekbox for "crop" and "not crop" rotation), Filter Blur<p/>';
   //reminderDescriptionEl.innerHTML += '<p>Oh, and before you write "task is not done" show me you task, at least that will be honest, right, anonymous friend? If you wrote any your structure of classes or just ?..<p/>';
-  reminderDescriptionEl.innerHTML += "<p>last upd: 19:38 MSK 31.08.2021</p>";
+  reminderDescriptionEl.innerHTML += "<p>last upd: 21:14 MSK 31.08.2021</p>";
   const buttonClose = document.createElement("button");
   buttonClose.classList.add("reminder__button-close");
   buttonClose.onclick = () => reminderEl.classList.add("visually-hidden");
