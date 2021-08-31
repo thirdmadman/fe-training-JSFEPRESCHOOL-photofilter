@@ -208,6 +208,8 @@ class MultifunctionalGraphicEditor {
       const button = document.createElement('button');
       button.onclick = () => this.selectCurrentAction(el);
       button.textContent = el;
+      button.classList.add('graphic-editor__button_select-action');
+      button.classList.add('graphic-editor__button');
       avalibleActionsEl.appendChild(button);
     });
 
@@ -307,7 +309,9 @@ class MultifunctionalGraphicEditor {
       }
     }
     const buttonCommit = document.createElement('button');
-    buttonCommit.classList.add('button-commit-changes');
+    buttonCommit.classList.add('graphic-editor__button');
+    buttonCommit.classList.add('graphic-editor__button_commit-changes');
+
     buttonCommit.textContent = 'Commit changes made in current action';
     buttonCommit.onclick = () => this.actionsSequence.getLastAction().isCommited = true;
     this.currentActionControlsEl.appendChild(buttonCommit);

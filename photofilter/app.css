@@ -29,11 +29,83 @@ body {
   overflow: hidden !important;
 }
 
+.graphic-editor__canvas-field {
+  position: relative;
+}
 
+.graphic-editor__canvas-field:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0px;
+  background: rgba(255, 255, 255, 0.48);
+  height: 1px;
+  width: 100%;
+  mix-blend-mode: difference;
+}
 
+.graphic-editor {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #252525;
+}
 
+.graphic-editor__button {
+  all: unset;
+  padding: 5px;
+  margin: 0 10px;
+  font-size: 12px;
+  background: #252525;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
 
+.graphic-editor__button:hover {
+  cursor: pointer;
+}
 
+.graphic-editor__button:active {
+  transform: translateY(2px);
+}
+
+.graphic-editor__main-menu {
+  display: flex;
+  margin: 10px 0;
+}
+
+.graphic-editor__button-import-image {
+  color: #ffffff;
+}
+
+.graphic-editor__avalible-actions {
+}
+
+.graphic-editor__actions-history {
+}
+
+.graphic-editor__current-action-controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 10px 0;
+}
+
+.graphic-editor__input-rotate-image {
+  min-width: 320px;
+}
+
+.graphic-editor__button_commit-changes {
+  margin: 10px;
+  padding: 10px;
+}
+
+.graphic-editor__button_commit-changes:active {
+  background-color: #3e8e41;
+}
 
 .reminder {
   position: absolute;
