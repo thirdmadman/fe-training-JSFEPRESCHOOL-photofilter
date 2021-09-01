@@ -209,10 +209,15 @@ class MultifunctionalGraphicEditor {
 
     this.canvasEl = document.createElement("canvas");
 
+    const canvasFieldContainerEl = document.createElement("div");
+    canvasFieldContainerEl.classList.add("graphic-editor__canvas-field-container");
+
     const canvasFieldEl = document.createElement("div");
     canvasFieldEl.classList.add("graphic-editor__canvas-field");
     canvasFieldEl.appendChild(this.resultImgEl);
     //canvasFieldEl.appendChild(this.canvasEl);
+
+    canvasFieldContainerEl.appendChild(canvasFieldEl);
 
     const labelImportImage = document.createElement("label");
     labelImportImage.textContent = "Import Image";
@@ -263,8 +268,6 @@ class MultifunctionalGraphicEditor {
     const mainMenuEl = document.createElement("div");
     mainMenuEl.classList.add("graphic-editor__main-menu");
     mainMenuEl.appendChild(fileActionEl);
-    mainMenuEl.appendChild(avalibleActionsEl);
-    mainMenuEl.appendChild(this.actionsHistoryEl);
 
     btnImportImage.addEventListener("change", (e) => {
       this.srcImage = new Image();
@@ -292,9 +295,20 @@ class MultifunctionalGraphicEditor {
       }
     });
 
+    let mainBody = document.createElement("div");
+    mainBody.classList.add("graphic-editor__main-body");
+
+    let mainBodyImageControls = document.createElement("div");
+    mainBodyImageControls.classList.add("image-controls");
+
+    mainBody.appendChild(canvasFieldContainerEl);
+    mainBodyImageControls.appendChild(this.actionsHistoryEl);
+    mainBodyImageControls.appendChild(avalibleActionsEl);
+    mainBodyImageControls.appendChild(this.currentActionControlsEl);
+    mainBody.appendChild(mainBodyImageControls);
+
     this.node.appendChild(mainMenuEl);
-    this.node.appendChild(canvasFieldEl);
-    this.node.appendChild(this.currentActionControlsEl);
+    this.node.appendChild(mainBody);
 
     document.getElementsByTagName("main")[0].appendChild(this.node);
   }
@@ -316,16 +330,29 @@ class MultifunctionalGraphicEditor {
 
   downloadImageInCanvas(filename = "exportedimage.png") {
     if (this.srcImage) {
-      let link = document.createElement('a');
+      let link = document.createElement("a");
       link.download = filename;
-      link.href = this.canvasEl.toDataURL()
+      link.href = this.canvasEl.toDataURL();
       link.click();
     }
   }
 
   renderCurrentActionsHistory() {
     this.actionsHistoryEl.textContent = "";
-    this.actionsSequence.getActionNamesArray().forEach((el) => (this.actionsHistoryEl.textContent += " > " + el));
+    let actionsHistoryContainer = document.createElement("div");
+    actionsHistoryContainer.classList.add("actions-history-container");
+
+    let actionsHistoryTitle = document.createElement("div");
+    actionsHistoryTitle.classList.add("actions-history__title");
+    actionsHistoryTitle.textContent = "Actions History";
+    this.actionsSequence.getActionNamesArray().forEach((el) => {
+      let action = document.createElement("div");
+      action.textContent = el;
+      action.classList.add("actions-history__action");
+      actionsHistoryContainer.appendChild(action);
+    });
+    this.actionsHistoryEl.appendChild(actionsHistoryTitle);
+    this.actionsHistoryEl.appendChild(actionsHistoryContainer);
   }
 
   cancelLastAction() {
@@ -355,10 +382,8 @@ class MultifunctionalGraphicEditor {
           isExpandCheckboxLabel.classList.add("graphic-editor__action-checkbox-label");
           isExpandCheckboxLabel.appendChild(isExpandCheckbox);
           const isExpandCheckboxLabelText = document.createElement("span");
-          isExpandCheckboxLabelText.textContent= "Expand canvas for avoid corners crop";
+          isExpandCheckboxLabelText.textContent = "Expand canvas for avoid corners crop";
           isExpandCheckboxLabel.appendChild(isExpandCheckboxLabelText);
-
-
 
           const inputRotate = document.createElement("input");
           inputRotate.classList.add("graphic-editor__action-input-range");
@@ -386,11 +411,10 @@ class MultifunctionalGraphicEditor {
           const inputRotateLabel = document.createElement("label");
           inputRotateLabel.classList.add("graphic-editor__action-input-range-label");
           const inputRotateLabelText = document.createElement("p");
-          inputRotateLabelText.textContent= "Rotate";
+          inputRotateLabelText.textContent = "Rotate";
           inputRotateLabel.appendChild(inputRotateLabelText);
           inputRotateLabel.appendChild(inputRotate);
 
-          
           this.currentActionControlsEl.appendChild(inputRotateLabel);
           this.currentActionControlsEl.appendChild(isExpandCheckboxLabel);
           break;
@@ -406,10 +430,10 @@ class MultifunctionalGraphicEditor {
           inputRange.oninput = (e) => {
             let lastAction = this.actionsSequence.getLastAction();
             if (lastAction && lastAction.actionName === "Filter Blur" && !lastAction.isCommited) {
-              lastAction.setParamObj({ length: e.target.value + 'px'});
+              lastAction.setParamObj({ length: e.target.value + "px" });
             } else {
               let action = new ActionFilterBlur();
-              action.setParamObj({ length: e.target.value + 'px'});
+              action.setParamObj({ length: e.target.value + "px" });
               this.actionsSequence.addAction(action);
             }
             this.renderFinalImage();
@@ -418,11 +442,10 @@ class MultifunctionalGraphicEditor {
           const inputRangeLabel = document.createElement("label");
           inputRangeLabel.classList.add("graphic-editor__action-input-range-label");
           const inputRangeLabelText = document.createElement("p");
-          inputRangeLabelText.textContent= "Blur radius length";
+          inputRangeLabelText.textContent = "Blur radius length";
           inputRangeLabel.appendChild(inputRangeLabelText);
           inputRangeLabel.appendChild(inputRange);
 
-          
           this.currentActionControlsEl.appendChild(inputRangeLabel);
           break;
         }
@@ -437,10 +460,10 @@ class MultifunctionalGraphicEditor {
           inputRange.oninput = (e) => {
             let lastAction = this.actionsSequence.getLastAction();
             if (lastAction && lastAction.actionName === "Filter Brightness/Сontrast" && !lastAction.isCommited) {
-              lastAction.setParamObj({ brightness: e.target.value + '%', contrast: lastAction.getParamObj().contrast});
+              lastAction.setParamObj({ brightness: e.target.value + "%", contrast: lastAction.getParamObj().contrast });
             } else {
               let action = new ActionFilterBrightnessСontrast();
-              action.setParamObj({ brightness: inputRange.value + '%', contrast: inputRange2.value+"%"});
+              action.setParamObj({ brightness: inputRange.value + "%", contrast: inputRange2.value + "%" });
               this.actionsSequence.addAction(action);
             }
             this.renderFinalImage();
@@ -449,11 +472,9 @@ class MultifunctionalGraphicEditor {
           const inputRangeLabel = document.createElement("label");
           inputRangeLabel.classList.add("graphic-editor__action-input-range-label");
           const inputRangeLabelText = document.createElement("p");
-          inputRangeLabelText.textContent= "Brightness";
+          inputRangeLabelText.textContent = "Brightness";
           inputRangeLabel.appendChild(inputRangeLabelText);
           inputRangeLabel.appendChild(inputRange);
-
-          
 
           const inputRange2 = document.createElement("input");
           inputRange2.classList.add("graphic-editor__action-input-range");
@@ -465,10 +486,10 @@ class MultifunctionalGraphicEditor {
           inputRange2.oninput = (e) => {
             let lastAction = this.actionsSequence.getLastAction();
             if (lastAction && lastAction.actionName === "Filter Brightness/Сontrast" && !lastAction.isCommited) {
-              lastAction.setParamObj({ brightness: lastAction.getParamObj().brightness, contrast: e.target.value + '%'});
+              lastAction.setParamObj({ brightness: lastAction.getParamObj().brightness, contrast: e.target.value + "%" });
             } else {
               let action = new ActionFilterBrightnessСontrast();
-              action.setParamObj({ brightness: inputRange.value + '%', contrast: e.target.value + '%'});
+              action.setParamObj({ brightness: inputRange.value + "%", contrast: e.target.value + "%" });
               this.actionsSequence.addAction(action);
             }
             this.renderFinalImage();
@@ -477,7 +498,7 @@ class MultifunctionalGraphicEditor {
           const inputRange2Label = document.createElement("label");
           inputRangeLabel.classList.add("graphic-editor__action-input-range-label");
           const inputRange2LabelText = document.createElement("p");
-          inputRange2LabelText.textContent= "Сontrast";
+          inputRange2LabelText.textContent = "Сontrast";
           inputRange2Label.appendChild(inputRange2LabelText);
           inputRange2Label.appendChild(inputRange2);
 
