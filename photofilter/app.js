@@ -5,8 +5,10 @@ class MGEAction {
 
   actionControlsEl = null;
 
-  constructor() {
-    //console.log(this.getActionName());
+  constructor(paramObj = null) {
+    if (paramObj) {
+      this.setParamObj(paramObj);
+    }
   }
 
   getActionName() {
@@ -126,16 +128,18 @@ class ActionCropImage extends MGEAction {
   renderAction(paramObj, img) {
     let canvas = document.createElement("canvas");
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-    canvas.width = width;
-    canvas.height = height;
 
-    let scrCropX = paramObj.x;
-    let srcCropY = paramObj.y;
-    let srcCropWidth = paramObj.width;
-    let srcCropHeight = paramObj.height;
+    let scrCropX = paramObj.xLeft;
+    let srcCropY = paramObj.yTop;
+
+    let srcCropWidth = paramObj.xRight - paramObj.xLeft;
+    let srcCropHeight = paramObj.yBottom - paramObj.yTop;
 
     let destWidth = srcCropWidth;
     let destHeight = srcCropHeight;
+
+    canvas.width = destWidth;
+    canvas.height = destHeight;
     let destX = canvas.width / 2 - destWidth / 2;
     let destY = canvas.height / 2 - destHeight / 2;
 
@@ -184,7 +188,7 @@ class ActionsSequence {
   clearActionsHistory() {}
 }
 class MultifunctionalGraphicEditor {
-  actions = ["Rotate Image", "Filter Blur", "Crop Image", "Filter Brightness/Сontrast"];
+  actions = ["Rotate Image", "Crop Image", "Filter Blur", "Filter Brightness/Сontrast"];
   node = null;
   canvasEl = null;
   srcImage = null;
@@ -506,6 +510,102 @@ class MultifunctionalGraphicEditor {
           this.currentActionControlsEl.appendChild(inputRange2Label);
           break;
         }
+        case "Crop Image": {
+          const createInputRange = (max, min, value, name, callback) => {
+            const inputRange = document.createElement("input");
+            inputRange.classList.add("graphic-editor__action-input-range");
+            inputRange.type = "range";
+            inputRange.min = min;
+            inputRange.max = max;
+            inputRange.step = 1;
+            inputRange.value = value;
+            inputRange.oninput = (e) => callback(e);
+
+            const inputRangeLabel = document.createElement("label");
+            inputRangeLabel.classList.add("graphic-editor__action-input-range-label");
+            const inputRangeLabelText = document.createElement("p");
+            inputRangeLabelText.textContent = name;
+            inputRangeLabel.appendChild(inputRangeLabelText);
+            inputRangeLabel.appendChild(inputRange);
+            return inputRangeLabel;
+          };
+
+          let iR1 = createInputRange(this.canvasEl.width / 2, 0, 0, "Left", (e) => {
+            let lastAction = this.actionsSequence.getLastAction();
+            if (lastAction && lastAction.actionName === "Crop Image" && !lastAction.isCommited) {
+              lastAction.setParamObj({
+                xLeft: e.target.value * 1,
+                xRight: lastAction.getParamObj().xRight,
+                yTop: lastAction.getParamObj().yTop,
+                yBottom: lastAction.getParamObj().yBottom,
+              });
+              console.log(lastAction);
+            } else {
+              let action = new ActionCropImage();
+              action.setParamObj({ xLeft: e.target.value * 1, xRight: this.canvasEl.width, yTop: 0, yBottom: this.canvasEl.height });
+              console.log(action);
+              this.actionsSequence.addAction(action);
+            }
+            this.renderFinalImage();
+          });
+          let iR2 = createInputRange(this.canvasEl.width, this.canvasEl.width / 2, this.canvasEl.width, "Right", (e) => {
+            let lastAction = this.actionsSequence.getLastAction();
+            if (lastAction && lastAction.actionName === "Crop Image" && !lastAction.isCommited) {
+              lastAction.setParamObj({
+                xLeft: lastAction.getParamObj().xLeft,
+                xRight: e.target.value * 1,
+                yTop: lastAction.getParamObj().yTop,
+                yBottom: lastAction.getParamObj().yBottom,
+              });
+            } else {
+              let action = new ActionCropImage();
+              action.setParamObj({ xLeft: 0, xRight: e.target.value * 1, yTop: 0, yBottom: this.canvasEl.height });
+              console.log(action);
+              this.actionsSequence.addAction(action);
+            }
+            this.renderFinalImage();
+          });
+          let iR3 = createInputRange(this.canvasEl.height / 2, 0, 0, "Top", (e) => {
+            let lastAction = this.actionsSequence.getLastAction();
+            if (lastAction && lastAction.actionName === "Crop Image" && !lastAction.isCommited) {
+              lastAction.setParamObj({
+                xLeft: lastAction.getParamObj().xLeft,
+                xRight: lastAction.getParamObj().xRight,
+                yTop: e.target.value * 1,
+                yBottom: lastAction.getParamObj().yBottom,
+              });
+            } else {
+              let action = new ActionCropImage();
+              action.setParamObj({ xLeft: 0, xRight: this.canvasEl.width, yTop: e.target.value * 1, yBottom: this.canvasEl.height });
+              console.log(action);
+              this.actionsSequence.addAction(action);
+            }
+            this.renderFinalImage();
+          });
+          let iR4 = createInputRange(this.canvasEl.height, this.canvasEl.height / 2, this.canvasEl.height, "Bottom", (e) => {
+            let lastAction = this.actionsSequence.getLastAction();
+            if (lastAction && lastAction.actionName === "Crop Image" && !lastAction.isCommited) {
+              lastAction.setParamObj({
+                xLeft: lastAction.getParamObj().xLeft,
+                xRight: lastAction.getParamObj().xRight,
+                yTop: lastAction.getParamObj().yTop,
+                yBottom: e.target.value * 1,
+              });
+            } else {
+              let action = new ActionCropImage();
+              action.setParamObj({ xLeft: 0, xRight: this.canvasEl.width, yTop: 0, yBottom: e.target.value * 1 });
+              console.log(action);
+              this.actionsSequence.addAction(action);
+            }
+            this.renderFinalImage();
+          });
+
+          this.currentActionControlsEl.appendChild(iR1);
+          this.currentActionControlsEl.appendChild(iR2);
+          this.currentActionControlsEl.appendChild(iR3);
+          this.currentActionControlsEl.appendChild(iR4);
+          break;
+        }
       }
 
       const buttonCommit = document.createElement("button");
@@ -526,35 +626,39 @@ class MultifunctionalGraphicEditor {
 let MGE = new MultifunctionalGraphicEditor();
 
 const addReminder = () => {
-  const reminderEl = document.createElement("div");
-  reminderEl.classList.add("reminder");
+  let deadLine = new Date("December 3, 2021 00:00:00");
+  let nowDate = Date.now();
 
-  const reminderContentEl = document.createElement("div");
-  reminderContentEl.classList.add("reminder-content");
+  if (nowDate < deadLine) {
+    const reminderEl = document.createElement("div");
+    reminderEl.classList.add("reminder");
+  
+    const reminderContentEl = document.createElement("div");
+    reminderContentEl.classList.add("reminder-content");
+  
+    const remindertitileEl = document.createElement("div");
+    remindertitileEl.classList.add("reminder__title");
+  
+    remindertitileEl.innerHTML = "Hello there!<br>This task still in progress, but it's about to be done<br> Me in discord: <strong>thirdmadman</strong>";
+  
+    const reminderDescriptionEl = document.createElement("div");
+    reminderDescriptionEl.classList.add("reminder__description");
+  
+    reminderDescriptionEl.innerHTML =
+      '<p>First of all: this app dynamically create all content of html for itself. In src file, main tag is empty. In this app I have used canvas, so it\'s more about Graphic Editor other than Photo Filter - after each action, image, witch is rendered in page are changed - try to save it. As in real Graphic Editor, you dont have any already loaded images, <mark>you have to Import Image to start editing process<mark></p><p>Just in fact: in this structure of classes I have "actions history" (class ActionsSequence), actually that means that you will have a ability to cancel actions, save project to file, load previous project. You can chek out app.js for more info.</p><p>I afraid that for now, only <mark>features</mark> that you can use via UI is <mark>Import Image, Export Image, Rotate, Crop, Filter Blur, Filter Brightness/Сontrast, Cancel Last Action</mark> <p/>';
+    reminderDescriptionEl.innerHTML += "<p>last upd: 23:38 MSK 1.09.2021</p>";
+    const buttonClose = document.createElement("button");
+    buttonClose.classList.add("reminder__button-close");
+    buttonClose.onclick = () => reminderEl.classList.add("visually-hidden");
+    buttonClose.textContent = "ok, let me close this reminder and view current status of task";
+  
+    reminderDescriptionEl.appendChild(buttonClose);
+    reminderContentEl.appendChild(remindertitileEl);
+    reminderContentEl.appendChild(reminderDescriptionEl);
+    reminderEl.appendChild(reminderContentEl);
+  
+    document.body.appendChild(reminderEl);
+  }
 
-  const remindertitileEl = document.createElement("div");
-  remindertitileEl.classList.add("reminder__title");
-
-  remindertitileEl.innerHTML =
-    "Hello there!<br>This task still in progress. I need just a little bit of time... <br> Me in discord: <strong>thirdmadman</strong>";
-
-  const reminderDescriptionEl = document.createElement("div");
-  reminderDescriptionEl.classList.add("reminder__description");
-
-  reminderDescriptionEl.innerHTML =
-    '<p>First of all: this app dynamically created all content of html for itself. In src file, main tag is empty. In this app I have used canvas, so it\'s more about Graphic Editor other than Photo Filter - after each action, image, witch is rendered in page are changed - <mark>try to save it</mark>. In example of "photo filter" image actually is no changing, its only css transformations, so if you try to save it, you will not to see any changes.</p><p>Just in fact: in this structure of classes I have "actions history" (class ActionsSequence), actually that means that you will have a ability to cancel actions, save project to file, load previous project. You can chek out app.js for more info.</p><p>I afraid that for now, only features that you can use via UI is <mark>Import Image, Export Image, Rotate, Filter Blur, Filter Brightness/Сontrast, Cancel Last Action</mark> <p/>';
-  //reminderDescriptionEl.innerHTML += '<p>Oh, and before you write "task is not done" show me you task, at least that will be honest, right, anonymous friend? If you wrote any your structure of classes or just ?..<p/>';
-  reminderDescriptionEl.innerHTML += "<p>last upd: 19:40 MSK 1.09.2021</p>";
-  const buttonClose = document.createElement("button");
-  buttonClose.classList.add("reminder__button-close");
-  buttonClose.onclick = () => reminderEl.classList.add("visually-hidden");
-  buttonClose.textContent = "ok, let me close this reminder and view current status of task";
-
-  reminderDescriptionEl.appendChild(buttonClose);
-  reminderContentEl.appendChild(remindertitileEl);
-  reminderContentEl.appendChild(reminderDescriptionEl);
-  reminderEl.appendChild(reminderContentEl);
-
-  document.body.appendChild(reminderEl);
 };
 addReminder();
