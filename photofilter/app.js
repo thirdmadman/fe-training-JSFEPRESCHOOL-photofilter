@@ -121,6 +121,22 @@ class ActionFilterBrightnessСontrast extends MGEAction {
     return canvas;
   }
 }
+
+class ActionFilterHueSaturation extends MGEAction {
+  actionName = "Filter Hue/Saturation";
+  renderAction(paramObj, img) {
+    let canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    let ctx = canvas.getContext("2d");
+
+    ctx.filter = "hue-rotate(" + paramObj.huerotate + ")" + " saturate(" + paramObj.saturate + ")";
+    ctx.drawImage(img, 0, 0);
+    return canvas;
+  }
+}
+
 class ActionCropImage extends MGEAction {
   actionName = "Crop Image";
   renderAction(paramObj, img) {
@@ -186,7 +202,7 @@ class ActionsSequence {
   clearActionsHistory() {}
 }
 class MultifunctionalGraphicEditor {
-  actions = ["Rotate Image", "Crop Image", "Filter Blur", "Filter Brightness/Сontrast"];
+  actions = ["Rotate Image", "Crop Image", "Filter Blur", "Filter Brightness/Сontrast", "Filter Hue/Saturation"];
   node = null;
   canvasEl = null;
   srcImage = null;
@@ -373,11 +389,10 @@ class MultifunctionalGraphicEditor {
       this.renderFinalImage();
       this.currentActionControlsEl.innerHTML = "";
       this.renderCurrentActionsHistory();
-      this.resultImgEl.parentNode.classList.remove('graphic-editor__canvas-field_rotate');
+      this.resultImgEl.parentNode.classList.remove("graphic-editor__canvas-field_rotate");
       switch (action) {
         case "Rotate Image": {
-
-          this.resultImgEl.parentNode.classList.toggle('graphic-editor__canvas-field_rotate');
+          this.resultImgEl.parentNode.classList.toggle("graphic-editor__canvas-field_rotate");
           const isExpandCheckbox = document.createElement("input");
           isExpandCheckbox.classList.add("graphic-editor__action-checkbox");
           isExpandCheckbox.type = "checkbox";
@@ -606,6 +621,53 @@ class MultifunctionalGraphicEditor {
           this.currentActionControlsEl.appendChild(iR4);
           break;
         }
+        case "Filter Hue/Saturation": {
+          const createInputRange = (max, min, value, name, callback) => {
+            const inputRange = document.createElement("input");
+            inputRange.classList.add("graphic-editor__action-input-range");
+            inputRange.type = "range";
+            inputRange.min = min;
+            inputRange.max = max;
+            inputRange.step = 1;
+            inputRange.value = value;
+            inputRange.onchange = (e) => callback(e);
+
+            const inputRangeLabel = document.createElement("label");
+            inputRangeLabel.classList.add("graphic-editor__action-input-range-label");
+            const inputRangeLabelText = document.createElement("p");
+            inputRangeLabelText.textContent = name;
+            inputRangeLabel.appendChild(inputRangeLabelText);
+            inputRangeLabel.appendChild(inputRange);
+            return inputRangeLabel;
+          };
+
+          let iR1 = createInputRange(360, 0, 0, "Hue Rotation", (e) => {
+            let lastAction = this.actionsSequence.getLastAction();
+            if (lastAction && lastAction.actionName === "Filter Hue/Saturation" && !lastAction.isCommited) {
+              lastAction.setParamObj({ huerotate: e.target.value + "deg", saturate: lastAction.getParamObj().saturate });
+            } else {
+              let action = new ActionFilterHueSaturation();
+              action.setParamObj({ huerotate: e.target.value + "deg", saturate: 100 + "%" });
+              this.actionsSequence.addAction(action);
+            }
+            this.renderFinalImage();
+          });
+          let iR2 = createInputRange(200, 0, 100, "Saturation", (e) => {
+            let lastAction = this.actionsSequence.getLastAction();
+            if (lastAction && lastAction.actionName === "Filter Hue/Saturation" && !lastAction.isCommited) {
+              lastAction.setParamObj({ huerotate: lastAction.getParamObj().huerotate, saturate: e.target.value + "%" });
+            } else {
+              let action = new ActionFilterHueSaturation();
+              action.setParamObj({ huerotate: "0deg", saturate: e.target.value + "%" });
+              this.actionsSequence.addAction(action);
+            }
+            this.renderFinalImage();
+          });
+
+          this.currentActionControlsEl.appendChild(iR1);
+          this.currentActionControlsEl.appendChild(iR2);
+          break;
+        }
       }
 
       const buttonCommit = document.createElement("button");
@@ -632,18 +694,18 @@ const addReminder = () => {
   if (nowDate < deadLine) {
     const reminderEl = document.createElement("div");
     reminderEl.classList.add("reminder");
-  
+
     const reminderContentEl = document.createElement("div");
     reminderContentEl.classList.add("reminder-content");
-  
+
     const remindertitileEl = document.createElement("div");
     remindertitileEl.classList.add("reminder__title");
-  
+
     remindertitileEl.innerHTML = "Hello there!<br>This task still in progress, but it's about to be done<br> Me in discord: <strong>thirdmadman</strong>";
-  
+
     const reminderDescriptionEl = document.createElement("div");
     reminderDescriptionEl.classList.add("reminder__description");
-  
+
     reminderDescriptionEl.innerHTML =
       '<p>First of all: this app dynamically create all content of html for itself. In src file, main tag is empty. In this app I have used canvas, so it\'s more about Graphic Editor other than Photo Filter - after each action, image, witch is rendered in page are changed - try to save it. As in real Graphic Editor, you dont have any already loaded images, <mark>you have to Import Image to start editing process<mark></p><p>Just in fact: in this structure of classes I have "actions history" (class ActionsSequence), actually that means that you will have a ability to cancel actions, save project to file, load previous project. You can chek out app.js for more info.</p><p>I afraid that for now, only <mark>features</mark> that you can use via UI is <mark>Import Image, Export Image, Rotate, Crop, Filter Blur, Filter Brightness/Сontrast, Cancel Last Action</mark> <p/>';
     reminderDescriptionEl.innerHTML += "<p>last upd: 13:34 MSK 2.09.2021</p>";
@@ -651,14 +713,13 @@ const addReminder = () => {
     buttonClose.classList.add("reminder__button-close");
     buttonClose.onclick = () => reminderEl.classList.add("visually-hidden");
     buttonClose.textContent = "ok, let me close this reminder and view current status of task";
-  
+
     reminderDescriptionEl.appendChild(buttonClose);
     reminderContentEl.appendChild(remindertitileEl);
     reminderContentEl.appendChild(reminderDescriptionEl);
     reminderEl.appendChild(reminderContentEl);
-  
+
     document.body.appendChild(reminderEl);
   }
-
 };
 addReminder();
