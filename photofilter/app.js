@@ -761,7 +761,7 @@ const addReminder = () => {
     const buttonClose = document.createElement("button");
     buttonClose.classList.add("reminder__button-close");
     buttonClose.onclick = () => reminderEl.classList.add("visually-hidden");
-    buttonClose.textContent = "ok, let me close this reminder and view current status of task";
+    buttonClose.textContent = "ok, let me close this reminder and view task";
 
     reminderDescriptionEl.appendChild(buttonClose);
     reminderContentEl.appendChild(remindertitileEl);
