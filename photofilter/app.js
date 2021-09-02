@@ -396,7 +396,7 @@ class MultifunctionalGraphicEditor {
           inputRotate.max = "360";
           inputRotate.step = 1;
           inputRotate.value = 0;
-          inputRotate.oninput = (e) => {
+          inputRotate.onchange = (e) => {
             let lastAction = this.actionsSequence.getLastAction();
             if (lastAction && lastAction.actionName === "Rotate Image" && !lastAction.isCommited) {
               lastAction.setParamObj({ degrees: e.target.value, expand: isExpandCheckbox.checked });
@@ -431,7 +431,7 @@ class MultifunctionalGraphicEditor {
           inputRange.max = "30";
           inputRange.step = 0.5;
           inputRange.value = 0;
-          inputRange.oninput = (e) => {
+          inputRange.onchange = (e) => {
             let lastAction = this.actionsSequence.getLastAction();
             if (lastAction && lastAction.actionName === "Filter Blur" && !lastAction.isCommited) {
               lastAction.setParamObj({ length: e.target.value + "px" });
@@ -461,7 +461,7 @@ class MultifunctionalGraphicEditor {
           inputRange.max = "200";
           inputRange.step = 0.5;
           inputRange.value = 100;
-          inputRange.oninput = (e) => {
+          inputRange.onchange = (e) => {
             let lastAction = this.actionsSequence.getLastAction();
             if (lastAction && lastAction.actionName === "Filter Brightness/Сontrast" && !lastAction.isCommited) {
               lastAction.setParamObj({ brightness: e.target.value + "%", contrast: lastAction.getParamObj().contrast });
@@ -487,7 +487,7 @@ class MultifunctionalGraphicEditor {
           inputRange2.max = "200";
           inputRange2.step = 0.5;
           inputRange2.value = 100;
-          inputRange2.oninput = (e) => {
+          inputRange2.onchange = (e) => {
             let lastAction = this.actionsSequence.getLastAction();
             if (lastAction && lastAction.actionName === "Filter Brightness/Сontrast" && !lastAction.isCommited) {
               lastAction.setParamObj({ brightness: lastAction.getParamObj().brightness, contrast: e.target.value + "%" });
@@ -519,7 +519,7 @@ class MultifunctionalGraphicEditor {
             inputRange.max = max;
             inputRange.step = 1;
             inputRange.value = value;
-            inputRange.oninput = (e) => callback(e);
+            inputRange.onchange = (e) => callback(e);
 
             const inputRangeLabel = document.createElement("label");
             inputRangeLabel.classList.add("graphic-editor__action-input-range-label");
@@ -646,7 +646,7 @@ const addReminder = () => {
   
     reminderDescriptionEl.innerHTML =
       '<p>First of all: this app dynamically create all content of html for itself. In src file, main tag is empty. In this app I have used canvas, so it\'s more about Graphic Editor other than Photo Filter - after each action, image, witch is rendered in page are changed - try to save it. As in real Graphic Editor, you dont have any already loaded images, <mark>you have to Import Image to start editing process<mark></p><p>Just in fact: in this structure of classes I have "actions history" (class ActionsSequence), actually that means that you will have a ability to cancel actions, save project to file, load previous project. You can chek out app.js for more info.</p><p>I afraid that for now, only <mark>features</mark> that you can use via UI is <mark>Import Image, Export Image, Rotate, Crop, Filter Blur, Filter Brightness/Сontrast, Cancel Last Action</mark> <p/>';
-    reminderDescriptionEl.innerHTML += "<p>last upd: 23:38 MSK 1.09.2021</p>";
+    reminderDescriptionEl.innerHTML += "<p>last upd: 13:34 MSK 2.09.2021</p>";
     const buttonClose = document.createElement("button");
     buttonClose.classList.add("reminder__button-close");
     buttonClose.onclick = () => reminderEl.classList.add("visually-hidden");
