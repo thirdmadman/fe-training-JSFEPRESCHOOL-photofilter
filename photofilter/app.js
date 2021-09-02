@@ -137,6 +137,21 @@ class ActionFilterHueSaturation extends MGEAction {
   }
 }
 
+class ActionFilterInvert extends MGEAction {
+  actionName = "Filter Invert";
+  renderAction(paramObj, img) {
+    let canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    let ctx = canvas.getContext("2d");
+
+    ctx.filter = "invert(" + paramObj.invert + ")";
+    ctx.drawImage(img, 0, 0);
+    return canvas;
+  }
+}
+
 class ActionCropImage extends MGEAction {
   actionName = "Crop Image";
   renderAction(paramObj, img) {
@@ -202,7 +217,7 @@ class ActionsSequence {
   clearActionsHistory() {}
 }
 class MultifunctionalGraphicEditor {
-  actions = ["Rotate Image", "Crop Image", "Filter Blur", "Filter Brightness/Сontrast", "Filter Hue/Saturation"];
+  actions = ["Rotate Image", "Crop Image", "Filter Blur", "Filter Brightness/Сontrast", "Filter Hue/Saturation", "Filter Invert"];
   node = null;
   canvasEl = null;
   srcImage = null;
@@ -668,6 +683,36 @@ class MultifunctionalGraphicEditor {
           this.currentActionControlsEl.appendChild(iR2);
           break;
         }
+        case "Filter Invert": {
+          const inputRange = document.createElement("input");
+          inputRange.classList.add("graphic-editor__action-input-range");
+          inputRange.type = "range";
+          inputRange.min = 0;
+          inputRange.max = 100;
+          inputRange.step = 1;
+          inputRange.value = 0;
+          inputRange.onchange = (e) => {
+            let lastAction = this.actionsSequence.getLastAction();
+            if (lastAction && lastAction.actionName === "Filter Invert" && !lastAction.isCommited) {
+              lastAction.setParamObj({ invert: e.target.value + "%" });
+            } else {
+              let action = new ActionFilterInvert();
+              action.setParamObj({ invert: e.target.value + "%" });
+              this.actionsSequence.addAction(action);
+            }
+            this.renderFinalImage();
+          };
+
+          const inputRangeLabel = document.createElement("label");
+          inputRangeLabel.classList.add("graphic-editor__action-input-range-label");
+          const inputRangeLabelText = document.createElement("p");
+          inputRangeLabelText.textContent = "Filter Invert";
+          inputRangeLabel.appendChild(inputRangeLabelText);
+          inputRangeLabel.appendChild(inputRange);
+
+          this.currentActionControlsEl.appendChild(inputRangeLabel);
+          break;
+        }
       }
 
       const buttonCommit = document.createElement("button");
@@ -701,14 +746,18 @@ const addReminder = () => {
     const remindertitileEl = document.createElement("div");
     remindertitileEl.classList.add("reminder__title");
 
-    remindertitileEl.innerHTML = "Hello there!<br>This task still in progress, but it's about to be done<br> Me in discord: <strong>thirdmadman</strong>";
+    remindertitileEl.innerHTML = "Hello there!<br>Thank you for waiting.";
 
     const reminderDescriptionEl = document.createElement("div");
     reminderDescriptionEl.classList.add("reminder__description");
 
     reminderDescriptionEl.innerHTML =
-      '<p>First of all: this app dynamically create all content of html for itself. In src file, main tag is empty. In this app I have used canvas, so it\'s more about Graphic Editor other than Photo Filter - after each action, image, witch is rendered in page are changed - try to save it. As in real Graphic Editor, you dont have any already loaded images, <mark>you have to Import Image to start editing process<mark></p><p>Just in fact: in this structure of classes I have "actions history" (class ActionsSequence), actually that means that you will have a ability to cancel actions, save project to file, load previous project. You can chek out app.js for more info.</p><p>I afraid that for now, only <mark>features</mark> that you can use via UI is <mark>Import Image, Export Image, Rotate, Crop, Filter Blur, Filter Brightness/Сontrast, Cancel Last Action</mark> <p/>';
-    reminderDescriptionEl.innerHTML += "<p>last upd: 13:34 MSK 2.09.2021</p>";
+      '<p>First of all: this app dynamically create all content of html for itself. In src file, main tag is empty. In this app I have used canvas, so it\'s more about Graphic Editor other than Photo Filter - after each action, image, witch is rendered in page are changed - try to save it. As in real Graphic Editor, you dont have any already loaded images, <mark>you have to Import Image to start editing process<mark></p><p>Just in fact: in this structure of classes I have "actions history" (class ActionsSequence), actually that means that you have an ability to cancel actions, <strike>save project to file, load previous project</strike>. You can chek out app.js for more info.</p>';
+    reminderDescriptionEl.innerHTML +=
+      '<p><mark>Available features</mark> that you can use via UI: <mark>Import Image, Export Image, Cancel Last Action, Rotate, Crop, Filter Blur, Filter Brightness/Сontrast, "Filter Hue/Saturation","Filter Invert"</mark> <p/>';
+      reminderDescriptionEl.innerHTML +=
+      '<p><mark>Unreleased features</mark> that somehow implemented or planned but unready/unavailable: <mark>Save Project, Load Project, Full Actions History, Edit Previous Action , Share Project, Presets, Better Image Cropp ...</mark><p/>';
+      //reminderDescriptionEl.innerHTML += "<p>last upd: 13:34 MSK 2.09.2021</p>";
     const buttonClose = document.createElement("button");
     buttonClose.classList.add("reminder__button-close");
     buttonClose.onclick = () => reminderEl.classList.add("visually-hidden");
@@ -720,6 +769,10 @@ const addReminder = () => {
     reminderEl.appendChild(reminderContentEl);
 
     document.body.appendChild(reminderEl);
+
+    console.log("Self-test:");
+    console.log("Repeat original project +10 \nAdd additional functionality (required): +5\nAdditional functionality (optional): + >40(???)")
+
   }
 };
 addReminder();
