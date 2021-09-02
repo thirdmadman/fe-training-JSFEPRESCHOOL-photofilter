@@ -125,7 +125,7 @@ body {
   background: url("assets/png/background/bg-transparent.png");
 }
 
-.graphic-editor__canvas-field:before {
+.graphic-editor__canvas-field_rotate:before {
   content: "";
   position: absolute;
   top: 50%;
@@ -135,6 +135,18 @@ body {
   width: 100%;
   mix-blend-mode: difference;
 }
+
+.graphic-editor__canvas-field_rotate:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  background: rgb(0 255 255);
+  height: 100%;
+  width: 1px;
+  mix-blend-mode: difference;
+}
+
 
 .graphic-editor {
   display: flex;

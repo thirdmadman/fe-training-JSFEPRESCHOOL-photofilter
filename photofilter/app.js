@@ -107,7 +107,6 @@ class ActionFilterBlur extends MGEAction {
     return canvas;
   }
 }
-
 class ActionFilterBrightnessСontrast extends MGEAction {
   actionName = "Filter Brightness/Сontrast";
   renderAction(paramObj, img) {
@@ -122,7 +121,6 @@ class ActionFilterBrightnessСontrast extends MGEAction {
     return canvas;
   }
 }
-
 class ActionCropImage extends MGEAction {
   actionName = "Crop Image";
   renderAction(paramObj, img) {
@@ -375,9 +373,11 @@ class MultifunctionalGraphicEditor {
       this.renderFinalImage();
       this.currentActionControlsEl.innerHTML = "";
       this.renderCurrentActionsHistory();
-
+      this.resultImgEl.parentNode.classList.remove('graphic-editor__canvas-field_rotate');
       switch (action) {
         case "Rotate Image": {
+
+          this.resultImgEl.parentNode.classList.toggle('graphic-editor__canvas-field_rotate');
           const isExpandCheckbox = document.createElement("input");
           isExpandCheckbox.classList.add("graphic-editor__action-checkbox");
           isExpandCheckbox.type = "checkbox";
