@@ -1,0 +1,334 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  background: linear-gradient(170.68deg, #63595f 0%, #53464e 18.09%, #2f303a 51.16%, #302c38 80.89%, #2b2b36 99.22%);
+}
+
+.container {
+  max-width: 1440px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  border: 0 !important;
+  padding: 0 !important;
+  clip: rect(0 0 0 0) !important;
+  overflow: hidden !important;
+}
+
+/* rs school classes  >*/
+
+.header {
+  text-align: center;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.07);
+  height: 60px;
+}
+
+.header-title {
+  line-height: 60px;
+  font-weight: 600;
+  font-size: 20px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.footer {
+  background-color: rgba(255, 255, 255, 0.07);
+  height: 45px;
+}
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.github {
+  display: block;
+  /* width: 120px; */
+  height: 45px;
+  padding-left: 45px;
+  background-image: url("assets/svg/github.svg");
+  background-size: 35px;
+  background-repeat: no-repeat;
+  background-position: left center;
+  line-height: 45px;
+  color: #cbd5de;
+  font-size: 16px;
+  font-family: "Open Sans", sans-serif;
+  transition: 0.3s;
+  margin-left: 15px;
+}
+.github:hover {
+  color: #fff;
+}
+.rss {
+  display: block;
+  position: relative;
+  font-family: "Open Sans", sans-serif;
+  width: 115px;
+  height: 32px;
+  background-image: url("assets/svg/rss.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left center;
+  margin-right: 15px;
+}
+.rss-year {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 21px;
+  letter-spacing: -2px;
+  color: #cbd5de;
+  line-height: 0.9;
+  font-weight: bold;
+  transition: 0.3s;
+}
+.rss:hover .rss-year {
+  right: -5px;
+  letter-spacing: 0;
+}
+
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+/*< rs school classes  */
+
+.graphic-editor__canvas-field-container {
+    min-width: 320px;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    justify-content: center;
+}
+
+.graphic-editor__canvas-field {
+  position: relative;
+  border: 1px solid #ffffff;
+  font-size: 0px;
+  background: url("assets/png/background/bg-transparent.png");
+}
+
+.graphic-editor__canvas-field_rotate:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0px;
+  background: rgb(0 255 255);
+  height: 1px;
+  width: 100%;
+  mix-blend-mode: difference;
+}
+
+.graphic-editor__canvas-field_rotate:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  background: rgb(0 255 255);
+  height: 100%;
+  width: 1px;
+  mix-blend-mode: difference;
+}
+
+
+.graphic-editor {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background: #4c4c4c;
+  color: #ffffff;
+  min-height: calc(100vh - 105px);
+  /* max-width: 1140px; */
+  padding: 0 15px;
+}
+
+.graphic-editor__button {
+  all: unset;
+  padding: 5px 10px;
+  font-size: 12px;
+  background: #00000075;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+.graphic-editor__button:hover {
+  cursor: pointer;
+}
+
+.graphic-editor__button:active {
+  transform: translateY(2px);
+}
+
+.graphic-editor__main-menu {
+  display: flex;
+  margin: 10px 0;
+  align-items: center;
+}
+
+.graphic-editor__main-body {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+    width: 100%;
+}
+.image-controls {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.graphic-editor__rendered-image {
+  max-height: 500px;
+  max-width: calc(100vw - 30px);
+}
+
+.graphic-editor__button-import-image {
+  color: #ffffff;
+}
+
+.graphic-editor__avalible-actions {margin-bottom: 20px;}
+
+.graphic-editor__actions-history {
+  font-size: 12px;
+  margin-bottom: 25px;
+}
+
+.graphic-editor__current-action-controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 20px 0;
+}
+
+.graphic-editor__input-rotate-image {
+  min-width: 320px;
+}
+
+.graphic-editor__button-import-image-label {
+}
+
+.graphic-editor__button-import-image-label:hover {}
+
+.graphic-editor__button-export-image {
+}
+
+.graphic-editor__button_commit-changes {
+  margin: 10px 0px;
+  padding: 10px;
+}
+
+.graphic-editor__button_commit-changes:active {
+  background-color: #3e8e41;
+}
+
+.graphic-editor__action-checkbox {
+    margin-right: 15px;
+}
+.graphic-editor__action-checkbox-label {
+    margin-bottom: 20px;
+}
+.graphic-editor__action-input-range-label {
+    margin-bottom: 15px;
+}
+.graphic-editor__action-input-range {
+    width: 320px;
+    margin-top: 5px;
+}
+
+.actions-history-container {
+    height: 50px;
+    overflow-y: auto;
+    min-width: 160px;
+    border-bottom: 1px solid #ffffff;
+    border-top: 1px solid #ffffff;
+}
+
+
+.actions-history-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.actions-history-container::-webkit-scrollbar-track {
+    background-color: darkgrey;
+}
+
+.actions-history-container::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+
+.actions-history__title {
+    font-weight: 800;
+    margin: 15px 0;
+}
+.actions-history__action {
+    margin: 5px;
+}
+
+/* reminder */
+.reminder {
+  position: absolute;
+  display: flex;
+  top: 0px;
+  left: 0px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: #ffffffeb;
+}
+
+.reminder-content {
+  max-width: 640px;
+  line-height: 26px;
+  position: relative;
+}
+
+.reminder__title {
+  padding: 20px;
+  font-size: 18px;
+}
+
+.reminder__description {
+  padding: 5px;
+}
+
+.reminder__description > p {
+  display: block;
+  margin-top: 10px;
+}
+
+.reminder__button-close {
+  font-weight: 800;
+  color: rgb(0 0 0);
+  width: 100%;
+  padding: 10px;
+  text-transform: uppercase;
+  margin-top: 20px;
+}
+.reminder__button-close:hover {
+  cursor: pointer;
+  color: #00861d;
+}
